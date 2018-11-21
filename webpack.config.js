@@ -35,6 +35,9 @@ module.exports = {
         ]
     },
     plugins: [
-        //new LiveReloadPlugin()
+        new LiveReloadPlugin({
+            hostname: "www.formula1.local",
+            appendScriptTag: true
+        })
     ]
   }
