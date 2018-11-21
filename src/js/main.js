@@ -1,8 +1,10 @@
+// Is possible to add, remove or change seasons list
 const   availableSeasons = [2009,2010,2011,2012,2013,2014,2015,2016,2017,2018],
-        CACHE = {
+        CACHE = { // Object where to store seasons retrived by http request. 
             seasons: []
         };
-    
+
+// Get the availableSeasons array and build the season menu html
 function buildSeasonsList(){
     if(Array.isArray(availableSeasons) && availableSeasons.length > 0){
         let seasonsListRoot = document.getElementById('seasonsList'),
@@ -16,20 +18,29 @@ function buildSeasonsList(){
                         </a>
                     </li>`;
         });
+        // the last item is the button to access at favorite list
         html += '<li><i id="showFavorites" class="material-icons md-light hidden">favorite_border</i></li>';
         seasonsListRoot.innerHTML = html;
+
+        // I dont like this syntax but Firefox need the event obj as argument inside a callback :(
         seasonsListRoot.addEventListener('click', (event)=>eventWrapper(event,(event)=>getSeason(event,null, renderSeason)), false);
     }
 }
+
+/*  
+    Event handler. Is possible to set an event at parent node and get the element target without a loop but simply 
+    stopping the propagation in the bubbling phase 
+*/
 function eventWrapper(event,callback) {
-    console.log(event);
-    
     if (event.target !== event.currentTarget) {
         callback(event);
     }
     event.stopPropagation();
 }
 
+/*
+    Handle the http GET request and retrieve data from server.
+*/
 function httpHandler(type, url,callback){
     const Http = new XMLHttpRequest();
     let Data = {};
@@ -44,11 +55,14 @@ function httpHandler(type, url,callback){
             callback(Data);
         }
     };
-    console.log("http request");
     Http.open(type, url, true);
     Http.send();
 }
 
+/*
+    Retrieve data for selected season from http request and save it on cache if not exist. 
+    Otherwise get data directly from cache object.
+*/
 function getSeason(event, season=null,callback){
     if(season===null) season = event.target.getAttribute('data-season');
 
@@ -57,14 +71,17 @@ function getSeason(event, season=null,callback){
             content = document.getElementsByClassName("content")[0],
             menuItems = document.querySelectorAll('nav a');
         
+        // Season not exist in CACHE, get from http request
         if(!CACHE.seasons.hasOwnProperty(season)){
             httpHandler("GET",url,Data=>{
                 let races = Data.MRData.RaceTable.Races;
                 callback(races);
+                // Save it to CACHE for the future
                 CACHE.seasons[season] = races;
                 console.log('HTTP');
             });
         }else{
+            // Season exist in CACHE.
             callback(CACHE.seasons[season]);
             console.log('CACHE');
         }
@@ -77,6 +94,9 @@ function getSeason(event, season=null,callback){
     toggleMobileMenu();
 }
 
+/*
+    Get data and generate the HTML code for season table to display.
+*/
 function renderSeason(races){
     let seasonRaces = document.getElementById('dataPlaceholder'),
         seasonId = "S"+races[0].season;
@@ -108,18 +128,23 @@ function renderSeason(races){
     document.getElementById("intro").style.display = "none";
 }
 
-function actionsHandler(event){
+/*
+    Handler for material_design buttons. Check what tipe of button is clicked and call right function
+*/
+function actionsHandler(event){ 
     if(event.target.innerHTML == "favorite") toggleFavorites(event);
     if(event.target.innerHTML == "info") showRaceDetails(event);
 }
 
+/* 
+    Toggle favorites updating a localStorage object
+*/
 function toggleFavorites(event){
     let season = event.target.getAttribute('data-season'),
         race = event.target.getAttribute('data-race'),
         favorites = localStorage.getObj("favorites"),
         favouritesStatus = "remove",
         btnFavoriteList = document.getElementById("showFavorites");
-        console.log("CHECK FAV: "+checkFavorites(season, race));
         
     if(checkFavorites(season, race)){
         favorites[season].splice(favorites[season].indexOf(race), 1);
@@ -135,6 +160,9 @@ function toggleFavorites(event){
     Object.keys(favorites).length > 0 ? btnFavoriteList.classList.remove('hidden') : btnFavoriteList.classList.add('hidden');
 }
 
+/* 
+    Check if favorite race is present or not in localStorage object. Used in toggleFavorites function. 
+*/
 function checkFavorites(season, race){
     if(localStorage.getItem("favoritesExist") === null){
         let tmpObj = {};
@@ -147,13 +175,20 @@ function checkFavorites(season, race){
     
     if(favorites.hasOwnProperty(season)){
         if(favorites[season].indexOf(race)!==-1){
+            //yes esist in favorite obj
             return true;
         }
     }
+    //no, dosn't esist in favorite obj
     return false;
 }
 
+/*
+    Similar to renderSeason function, this one generate the HTML code for a list of favorites. 
+    The data is retrived from localStorage object
+*/
 function renderFavorites(){
+    // The favorites list is stored in localStorage
     let favorites = localStorage.getObj("favorites"),
         html = `<h2>Favorites List</h2>
                 <div>
@@ -171,7 +206,7 @@ function renderFavorites(){
                         </thead>
                         <tbody>`;
     Object.keys(favorites).forEach(season=> {
-        let races = CACHE.seasons[season];
+        let races = CACHE.seasons[season]; // retrieve informations to display of races because function get only season and race round
         favorites[season].forEach(race=>{
             races.filter(item => {
                 if(item.round === race) html += seasonListTemplate(item);
@@ -187,6 +222,9 @@ function renderFavorites(){
     document.getElementById("favoritesList").addEventListener('click', (event)=>eventWrapper(event,(event)=>actionsHandler(event)), false);
 }
 
+/* 
+    Called by renderSeason and renderFavorite, generate the HTML inside the season races list table. 
+*/
 function seasonListTemplate(race){
     let favouritesStatus = (checkFavorites(race.season, race.round)) ? "remove" : "add",
         raceId = `${race.season}${race.round}`,
@@ -214,6 +252,7 @@ function seasonListTemplate(race){
     return html;
 }
 
+// Formatting the date of race
 function formatDate(strDate){
     let objDate = new Date(strDate),
         months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
@@ -222,6 +261,7 @@ function formatDate(strDate){
         return `${day} ${months[objDate.getMonth()]}`
 }
 
+// Mobile hamburger menu button handler
 function toggleMobileMenu(){    
     if(document.getElementById("mobileMenu").style.display != "none"){
         let mainMenu = document.getElementById("main");
@@ -234,6 +274,10 @@ function toggleMobileMenu(){
     }
 }
 
+/* 
+    In mobile version there is few space for a full table of data. Only race name is displayed and a info button is added.
+    On click on info button other race informations are displayed expanding table row
+*/
 function showRaceDetails(event){
     let detailId = "D" + event.target.getAttribute("data-details")
         detail = document.getElementById(detailId);
@@ -246,9 +290,15 @@ function showRaceDetails(event){
     }
 }
 
+// Initializations of page on load
 window.onload = () => {
-    buildSeasonsList();
-    localStorage.clear();
+    buildSeasonsList(); // build the nav menu
+    localStorage.clear(); // reset the favorite list every time the page is reloaded
+
+    /*
+        Local storage can store only strings. I've extended the prototype with 2 methods to structurated data as object.
+        I do that simply encode and decode object in JSON string
+    */
     Storage.prototype.setObj = function(key, obj) {
         return this.setItem(key, JSON.stringify(obj))
     }

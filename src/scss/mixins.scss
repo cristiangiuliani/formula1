@@ -1,3 +1,8 @@
+/*
+    This SCSS file contains all the mixins used in main.scss file
+*/
+
+// Resolutions Breakpoints
 $tablet: 768px;
 $desktop: 992px;
 $wide: 1200px;
@@ -26,7 +31,7 @@ $wide: 1200px;
   }
 }
 
-
+// Table style for race lists (season and favorite)
 @mixin season-table {
     $cell-padding: 15px 10px;
     table{
@@ -122,6 +127,8 @@ $wide: 1200px;
         }
     }
 }
+
+// Fade in animations
 @mixin fade-in($time, $delay) {
     animation: fade-in $time ease $delay forwards;
     @keyframes fade-in{
@@ -134,6 +141,7 @@ $wide: 1200px;
     }
 }
 
+// Fade in animations from 0 to 50% of opacity
 @mixin fade-in-50($time, $delay) {
     animation: fade-in-50 $time ease $delay forwards;
     @keyframes fade-in-50{
