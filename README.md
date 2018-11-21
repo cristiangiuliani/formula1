@@ -8,3 +8,5 @@ The compiled version is in `dist` folder and can be executed standalone without 
 
 ## Features
 The project is responsive and cross-browser (NOT TESTED ON IE because I shall reinstall a windows vm on my Mac).
+
+For many details read comments inside code.
