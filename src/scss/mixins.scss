@@ -1,0 +1,147 @@
+$tablet: 768px;
+$desktop: 992px;
+$wide: 1200px;
+
+@mixin phone {
+    @media (max-width: #{$tablet - 1}) {
+      @content;
+    }
+  }
+
+@mixin tablet {
+  @media (min-width: #{$tablet}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+    @media (min-width: #{$desktop}) {
+      @content;
+    }
+  }
+
+@mixin wide {
+  @media (min-width: #{$wide}) {
+    @content;
+  }
+}
+
+
+@mixin season-table {
+    $cell-padding: 15px 10px;
+    table{
+        width: 100%;
+        thead{
+            tr{
+                background: $primary-color;
+                th{
+                    color: #FFF;
+                    padding: 15px 5px;
+                    font-size: 5vw;
+                    @include tablet{
+                        font-size: 13px;
+                        padding: 8px 3px;
+                    }
+                    @include desktop{
+                        font-size: 14px;
+                        padding: 10px 5px;
+                    }
+                    @include wide{
+                        font-size: 16px;
+                        padding: $cell-padding;
+                    }
+                    &::nth-child(1){
+                        width: 100%;
+                    }
+                }
+            }
+        }
+        tbody{
+            tr{
+                &:nth-child(even){
+                    background: #EDEDED;
+                }
+                td{
+                    padding: 15px 5px;
+                    font-size: 5vw;
+                    &::nth-child(1){
+                        width: 100%;
+                    }
+                    .material-icons{
+                        border: 1px solid #AAA;
+                        border-radius: 4px;
+                        padding: 4px;
+                        color: #AAA;
+                        cursor: pointer;
+                        &:hover{
+                            color: #333;
+                        }
+                        &.remove{
+                            color: $primary-color;
+                        }
+                        &:first-child{
+                            margin-right: 10px;
+                        }
+                    }
+                    @include tablet{
+                        .material-icons{
+                            border: none;
+                            padding: 0px;
+                            color: #AAA;
+                            font-size: 18px;
+                        }
+                        font-size: 13px;
+                        padding: 8px 3px;
+                        border: none;
+                    }
+                    @include desktop{
+                        font-size: 14px;
+                        padding: 10px 5px;
+                    }
+                    @include wide{
+                        font-size: 16px;
+                        padding: $cell-padding;
+                    }
+                }
+                ul{
+                    display: none;
+                    font-size: 80%;
+                    margin-top: 1em;
+                    border-top: 1px solid #AAA;
+                    li{
+                        margin-top: 0.5em;
+                    }
+                }
+            }
+        }
+        &.season .hide-season{
+            display: none;
+        }
+        &.favorites .hide-favorites{
+            display: none;
+        }
+    }
+}
+@mixin fade-in($time, $delay) {
+    animation: fade-in $time ease $delay forwards;
+    @keyframes fade-in{
+        0%{
+            opacity: 0;
+        }
+        100%{
+            opacity: 1;
+        }
+    }
+}
+
+@mixin fade-in-50($time, $delay) {
+    animation: fade-in-50 $time ease $delay forwards;
+    @keyframes fade-in-50{
+        0%{
+            opacity: 0;
+        }
+        100%{
+            opacity: 0.5;
+        }
+    }
+}
