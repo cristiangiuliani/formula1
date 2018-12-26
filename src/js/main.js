@@ -47,7 +47,7 @@ function httpHandler(type, url,callback){
     Http.onreadystatechange = () => {
         if (Http.readyState == 4 && Http.status == 200) {
             try {
-                Data = JSON.parse(Http.responseText);
+                Data = JSON.parse(Http.responseText);                
             } catch(err) {
                 console.log(err.message + " in " + Http.responseText);
                 return;
@@ -64,6 +64,7 @@ function httpHandler(type, url,callback){
     Otherwise get data directly from cache object.
 */
 function getSeason(event, season=null,callback){
+    
     if(season===null) season = event.target.getAttribute('data-season');
 
     if(season!==null){
@@ -308,5 +309,4 @@ window.onload = () => {
     document.getElementById("main").style.height = "0px";
     document.getElementById("mobileMenu").addEventListener('click', (event)=>toggleMobileMenu(event));
     document.getElementById("showFavorites").addEventListener('click', (event)=>renderFavorites(event));
-
 };
